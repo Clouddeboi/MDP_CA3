@@ -39,18 +39,19 @@ bool Server::InitNetworkManager()
 
 namespace
 {
-	const int   kMaxPickups = 30;
-	const float kPickupRespawnDelay = 2.f;
+	const int   kMaxPickups = 125;//Total target on the map
+	const int   kPickupsPerSpawn = 5;//How many to spawn each tick
+	const float kPickupRespawnDelay = 1.f;//Check interval in seconds
 
 	void SpawnMice(int inCount)
 	{
-		Vector3 mouseMin(100.f, 100.f, 0.f);
-		Vector3 mouseMax(4900.f, 4900.f, 0.f);
+		Vector3 pickupMin(200.f, 200.f, 0.f);
+		Vector3 pickupMax(4800.f, 4800.f, 0.f);
 
 		for (int i = 0; i < inCount; ++i)
 		{
 			GameObjectPtr go = GameObjectRegistry::sInstance->CreateGameObject('MOUS');
-			go->SetLocation(RoboMath::GetRandomVector(mouseMin, mouseMax));
+			go->SetLocation(RoboMath::GetRandomVector(pickupMin, pickupMax));
 		}
 	}
 
@@ -70,7 +71,7 @@ namespace
 
 void Server::SetupWorld()
 {
-	SpawnMice(kMaxPickups);
+	SpawnMice(kPickupsPerSpawn);
 }
 
 void Server::DoFrame()
@@ -97,7 +98,10 @@ void Server::RespawnPickupsIfNeeded()
 		int current = CountPickups();
 		if (current < kMaxPickups)
 		{
-			SpawnMice(kMaxPickups - current);
+			//Spawn a small batch per tick instead of all at once
+			int needed = kMaxPickups - current;
+			int toSpawn = (needed < kPickupsPerSpawn) ? needed : kPickupsPerSpawn;
+			SpawnMice(toSpawn);
 		}
 	}
 }

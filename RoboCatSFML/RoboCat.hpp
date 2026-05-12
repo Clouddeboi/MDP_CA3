@@ -41,13 +41,12 @@ protected:
 private:
 
 
-	void	AdjustVelocityByThrust(float inDeltaTime);
+	void	AdjustVelocityByInput(float inDeltaTime);
 
 	Vector3				mVelocity;
 
 
 	float				mMaxLinearSpeed;
-	float				mMaxRotationSpeed;
 
 	//bounce fraction when hitting various things
 	float				mWallRestitution;
@@ -62,7 +61,8 @@ protected:
 
 	float				mLastMoveTimestamp;
 
-	float				mThrustDir;
+	float				mHorizontalDir;
+	float				mVerticalDir;
 };
 
 typedef shared_ptr< RoboCat >	RoboCatPtr;

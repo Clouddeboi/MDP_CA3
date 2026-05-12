@@ -54,10 +54,9 @@ namespace
 	void CreateRandomMice(int inMouseCount)
 	{
 		Vector3 mouseMin(100.f, 100.f, 0.f);
-		Vector3 mouseMax(1180.f, 620.f, 0.f);
+		Vector3 mouseMax(4900.f, 4900.f, 0.f);
 		GameObjectPtr go;
 
-		//make a mouse somewhere- where will these come from?
 		for (int i = 0; i < inMouseCount; ++i)
 		{
 			go = GameObjectRegistry::sInstance->CreateGameObject('MOUS');

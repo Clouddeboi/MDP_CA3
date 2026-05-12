@@ -1,16 +1,16 @@
 #include "RoboCatPCH.hpp"
 
-const float WORLD_HEIGHT = 720.f;
-const float WORLD_WIDTH = 1280.f;
+const float WORLD_HEIGHT = 5000.f;
+const float WORLD_WIDTH = 5000.f;
 
 RoboCat::RoboCat() :
 	GameObject(),
-	mMaxRotationSpeed(100.f),
-	mMaxLinearSpeed(5000.f),
+	mMaxLinearSpeed(300.f),
 	mVelocity(Vector3::Zero),
 	mWallRestitution(0.1f),
 	mCatRestitution(0.1f),
-	mThrustDir(0.f),
+	mHorizontalDir(0.f),
+	mVerticalDir(0.f),
 	mPlayerId(0)
 {
 	SetCollisionRadius(60.f);
@@ -18,30 +18,37 @@ RoboCat::RoboCat() :
 
 void RoboCat::ProcessInput(float inDeltaTime, const InputState& inInputState)
 {
-	//process our input....
+	//No rotation, direct 8-directional movement
+	mHorizontalDir = inInputState.GetDesiredHorizontalDelta();
+	mVerticalDir = inInputState.GetDesiredVerticalDelta();
 
-	//turning...
-	float newRotation = GetRotation() + inInputState.GetDesiredHorizontalDelta() * mMaxRotationSpeed * inDeltaTime;
-	SetRotation(newRotation);
-
-	//moving...
-	float inputForwardDelta = inInputState.GetDesiredVerticalDelta();
-	mThrustDir = inputForwardDelta;
-
+	(void)inDeltaTime;
 }
 
-void RoboCat::AdjustVelocityByThrust(float inDeltaTime)
+void RoboCat::AdjustVelocityByInput(float inDeltaTime)
 {
-	//just set the velocity based on the thrust direction -- no thrust will lead to 0 velocity
-	//simulating acceleration makes the client prediction a bit more complex
-	Vector3 forwardVector = GetForwardVector();
-	mVelocity = forwardVector * (mThrustDir * inDeltaTime * mMaxLinearSpeed);
+	//Target velocity from input axes
+	float targetVX = mHorizontalDir * mMaxLinearSpeed;
+	float targetVY = -mVerticalDir * mMaxLinearSpeed;
+
+	//Acceleration when input is held, deceleration when released
+	float accel = 1800.f;  //how fast to reach full speed (units/sec^2)
+	float decel = 1200.f;  //how fast to slow down when no input
+
+	float lerpX = (targetVX != 0.f) ? accel : decel;
+	float lerpY = (targetVY != 0.f) ? accel : decel;
+
+	//Move current velocity toward target by accel/decel rate this frame
+	float alpha = inDeltaTime;
+
+	mVelocity.mX += (targetVX - mVelocity.mX) * (lerpX * alpha / mMaxLinearSpeed);
+	mVelocity.mY += (targetVY - mVelocity.mY) * (lerpY * alpha / mMaxLinearSpeed);
 }
 
 void RoboCat::SimulateMovement(float inDeltaTime)
 {
 	//simulate us...
-	AdjustVelocityByThrust(inDeltaTime);
+	AdjustVelocityByInput(inDeltaTime);
 	
 	SetLocation(GetLocation() + mVelocity * inDeltaTime);
 
@@ -140,29 +147,28 @@ void RoboCat::ProcessCollisionsWithScreenWalls()
 
 	float radius = GetCollisionRadius();
 
-	//if the cat collides against a wall, the quick solution is to push it off
 	if ((y + radius) >= WORLD_HEIGHT && vy > 0)
 	{
-		mVelocity.mY = -vy * mWallRestitution;
+		mVelocity.mY = 0.f;
 		location.mY = WORLD_HEIGHT - radius;
 		SetLocation(location);
 	}
 	else if (y - radius <= 0 && vy < 0)
 	{
-		mVelocity.mY = -vy * mWallRestitution;
+		mVelocity.mY = 0.f;
 		location.mY = radius;
 		SetLocation(location);
 	}
 
 	if ((x + radius) >= WORLD_WIDTH && vx > 0)
 	{
-		mVelocity.mX = -vx * mWallRestitution;
+		mVelocity.mX = 0.f;
 		location.mX = WORLD_WIDTH - radius;
 		SetLocation(location);
 	}
 	else if (x - radius <= 0 && vx < 0)
 	{
-		mVelocity.mX = -vx * mWallRestitution;
+		mVelocity.mX = 0.f;
 		location.mX = radius;
 		SetLocation(location);
 	}
@@ -176,14 +182,12 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 	{
 		inOutputStream.Write((bool)true);
 		inOutputStream.Write(GetPlayerId());
-
 		writtenState |= ECRS_PlayerId;
 	}
 	else
 	{
 		inOutputStream.Write((bool)false);
 	}
-
 
 	if (inDirtyState & ECRS_Pose)
 	{
@@ -197,8 +201,6 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 		inOutputStream.Write(location.mX);
 		inOutputStream.Write(location.mY);
 
-		inOutputStream.Write(GetRotation());
-
 		writtenState |= ECRS_Pose;
 	}
 	else
@@ -206,22 +208,20 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 		inOutputStream.Write((bool)false);
 	}
 
-	//always write mThrustDir- it's just two bits
-	if (mThrustDir != 0.f)
-	{
-		inOutputStream.Write(true);
-		inOutputStream.Write(mThrustDir > 0.f);
-	}
-	else
-	{
-		inOutputStream.Write(false);
-	}
+	//Always write movement dirs for remote cat interpolation (2 bits each)
+	auto WriteDir = [&](float dir)
+		{
+			bool isNonZero = (dir != 0.f);
+			inOutputStream.Write(isNonZero);
+			if (isNonZero) inOutputStream.Write(dir > 0.f);
+		};
+	WriteDir(mHorizontalDir);
+	WriteDir(mVerticalDir);
 
 	if (inDirtyState & ECRS_Color)
 	{
 		inOutputStream.Write((bool)true);
 		inOutputStream.Write(GetColor());
-
 		writtenState |= ECRS_Color;
 	}
 	else
@@ -231,6 +231,3 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 
 	return writtenState;
 }
-
-
-

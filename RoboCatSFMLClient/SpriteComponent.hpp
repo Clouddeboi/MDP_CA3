@@ -12,6 +12,7 @@ public:
 	void SetTexture(TexturePtr inTexture);
 	virtual sf::Sprite& GetSprite();
 	
+	float GetGameObjectScale() const { return mGameObject ? mGameObject->GetScale() : 0.f; }
 
 
 protected:

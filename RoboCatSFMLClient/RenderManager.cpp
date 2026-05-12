@@ -93,10 +93,16 @@ void RenderManager::RenderBackground()
 //render the cameras in order
 void RenderManager::RenderComponents()
 {
-	//Get the logical viewport so we can pass this to the SpriteComponents when it's draw time
+	//Sort smallest scale first so larger players render on top
+	std::sort(mComponents.begin(), mComponents.end(),
+		[](const SpriteComponent* a, const SpriteComponent* b)
+		{
+			return a->GetGameObjectScale() < b->GetGameObjectScale();
+		});
+
 	for (SpriteComponent* c : mComponents)
-	{	
-		WindowManager::sInstance->draw(c->GetSprite());	
+	{
+		WindowManager::sInstance->draw(c->GetSprite());
 	}
 }
 

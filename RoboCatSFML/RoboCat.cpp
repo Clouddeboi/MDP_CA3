@@ -11,7 +11,8 @@ RoboCat::RoboCat() :
 	mCatRestitution(0.1f),
 	mHorizontalDir(0.f),
 	mVerticalDir(0.f),
-	mPlayerId(0)
+	mPlayerId(0),
+	mSize(1.0f)
 {
 	SetCollisionRadius(60.f);
 }
@@ -229,5 +230,23 @@ uint32_t RoboCat::Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyS
 		inOutputStream.Write((bool)false);
 	}
 
+	if (inDirtyState & ECRS_Size)
+	{
+		inOutputStream.Write((bool)true);
+		inOutputStream.Write(mSize);
+		writtenState |= ECRS_Size;
+	}
+	else
+	{
+		inOutputStream.Write((bool)false);
+	}
+
 	return writtenState;
+}
+
+void RoboCat::SetSize(float inSize)
+{
+	mSize = inSize;
+	SetCollisionRadius(60.f * mSize);   //base radius 60 scaled by size
+	SetScale(mSize);                    //SpriteComponent reads GetScale() every frame
 }

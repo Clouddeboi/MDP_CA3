@@ -16,6 +16,8 @@ public:
 
 	void TakeDamage(int inDamagingPlayerId);
 
+	void GrowBy(float inAmount);
+
 protected:
 	RoboCatServer();
 

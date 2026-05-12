@@ -111,6 +111,15 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 		readState |= ECRS_Color;
 	}
 
+	inInputStream.Read(stateBit);
+	if (stateBit)
+	{
+		float replicatedSize;
+		inInputStream.Read(replicatedSize);
+		SetSize(replicatedSize);
+		readState |= ECRS_Size;
+	}
+
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
 		DoClientSidePredictionAfterReplicationForLocalCat(readState);

@@ -8,6 +8,7 @@ public:
 		ECRS_Pose = 1 << 0,
 		ECRS_Color = 1 << 1,
 		ECRS_PlayerId = 1 << 2,
+		ECRS_Size = 1 << 3,
 
 		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId
 	};
@@ -33,6 +34,9 @@ public:
 	void			SetVelocity(const Vector3& inVelocity) { mVelocity = inVelocity; }
 	const Vector3& GetVelocity()						const { return mVelocity; }
 
+	void	SetSize(float inSize);
+	float	GetSize() const { return mSize; }
+
 	virtual uint32_t	Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const override;
 
 protected:
@@ -54,6 +58,8 @@ private:
 
 
 	uint32_t			mPlayerId;
+
+	float		mSize;
 
 protected:
 

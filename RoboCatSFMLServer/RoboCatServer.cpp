@@ -15,7 +15,6 @@ void RoboCatServer::Update()
 
 	Vector3 oldLocation = GetLocation();
 	Vector3 oldVelocity = GetVelocity();
-	float oldRotation = GetRotation();
 
 	//are you controlled by a player?
 	//if so, is there a move we haven't processed yet?
@@ -49,9 +48,17 @@ void RoboCatServer::Update()
 
 
 	if (!RoboMath::Is2DVectorEqual(oldLocation, GetLocation()) ||
-		!RoboMath::Is2DVectorEqual(oldVelocity, GetVelocity()) ||
-		oldRotation != GetRotation())
+		!RoboMath::Is2DVectorEqual(oldVelocity, GetVelocity()))
 	{
 		NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Pose);
 	}
+}
+
+void RoboCatServer::GrowBy(float inAmount)
+{
+	float newSize = GetSize() + inAmount;
+	SetSize(newSize);
+	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Size);
+	//Collision radius changed so position may need correcting — mark pose dirty too
+	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Pose);
 }

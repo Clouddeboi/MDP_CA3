@@ -9,6 +9,8 @@ public:
 
 	void Render();
 
+	void StartRespawnCountdown(float inDuration);
+
 private:
 
 	HUD();
@@ -17,12 +19,16 @@ private:
 	void	RenderRoundTripTime();
 	void	RenderScoreBoard();
 	void	RenderText(const string& inStr, const Vector3& origin, const Vector3& inColor);
+	void	RenderDeathScreen();
 
 	Vector3										mBandwidthOrigin;
 	Vector3										mRoundTripTimeOrigin;
 	Vector3										mScoreBoardOrigin;
 	Vector3										mScoreOffset;
 	int											mHealth;
+
+	float	mRespawnTimeRemaining;
+	float	mRespawnDuration;
 };
 
 

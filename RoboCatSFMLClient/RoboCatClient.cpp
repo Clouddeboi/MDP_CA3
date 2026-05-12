@@ -10,6 +10,11 @@ RoboCatClient::RoboCatClient() :
 
 void RoboCatClient::HandleDying()
 {
+	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
+	{
+		HUD::sInstance->StartRespawnCountdown(3.f);
+	}
+
 	RoboCat::HandleDying();
 }
 

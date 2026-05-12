@@ -7,9 +7,7 @@ HUD::HUD() :
 	mScoreBoardOrigin(50.f, 60.f, 0.0f),
 	mBandwidthOrigin(50.f, 10.f, 0.0f),
 	mRoundTripTimeOrigin(580.f, 10.f, 0.0f),
-	mScoreOffset(0.f, 50.f, 0.0f),
-	mHealthOffset(1000, 10.f, 0.0f),
-	mHealth(0)
+	mScoreOffset(0.f, 50.f, 0.0f)
 {
 }
 
@@ -21,19 +19,9 @@ void HUD::StaticInit()
 
 void HUD::Render()
 {
-	RenderBandWidth();
-	RenderRoundTripTime();
+	//RenderBandWidth();
+	//RenderRoundTripTime();
 	RenderScoreBoard();
-	RenderHealth();
-}
-
-void HUD::RenderHealth()
-{
-	if (mHealth > 0)
-	{
-		string healthString = StringUtils::Sprintf("Health %d", mHealth);
-		RenderText(healthString, mHealthOffset, Colors::Red);
-	}
 }
 
 void HUD::RenderBandWidth()

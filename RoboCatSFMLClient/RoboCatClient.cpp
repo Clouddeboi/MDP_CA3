@@ -11,12 +11,6 @@ RoboCatClient::RoboCatClient() :
 void RoboCatClient::HandleDying()
 {
 	RoboCat::HandleDying();
-
-	//and if we're local, tell the hud so our health goes away!
-	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
-	{
-		HUD::sInstance->SetPlayerHealth(0);
-	}
 }
 
 

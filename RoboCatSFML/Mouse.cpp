@@ -1,6 +1,6 @@
 #include "RoboCatPCH.hpp"
 
-Mouse::Mouse()
+Mouse::Mouse() : mPickupValue(0.15f)
 {
 	SetScale(GetScale() * 0.5f);
 	SetCollisionRadius(20.f);

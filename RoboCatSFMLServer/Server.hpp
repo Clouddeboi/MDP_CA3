@@ -20,6 +20,9 @@ private:
 
 	bool	InitNetworkManager();
 	void	SetupWorld();
+	void	RespawnPickupsIfNeeded();
+
+	float	mPickupRespawnTimer;
 
 };
 

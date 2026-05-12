@@ -20,7 +20,11 @@ public:
 
 	virtual bool HandleCollisionWithCat(RoboCat* inCat) override;
 
+	float GetPickupValue() const { return mPickupValue; }
+
 protected:
 	Mouse();
+
+	float mPickupValue;
 };
 

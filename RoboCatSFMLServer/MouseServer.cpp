@@ -13,6 +13,10 @@ void MouseServer::HandleDying()
 
 bool MouseServer::HandleCollisionWithCat(RoboCat* inCat)
 {
+	//Tell the player to grow by this pickup's value
+	RoboCatServer* catServer = static_cast<RoboCatServer*>(inCat);
+	catServer->GrowBy(GetPickupValue());
+
 	//kill yourself!
 	SetDoesWantToDie(true);
 

@@ -44,6 +44,20 @@ void Client::DoFrame()
 
 	NetworkManagerClient::sInstance->ProcessIncomingPackets();
 
+	//Find the local player's cat and update the camera to follow it
+	uint32_t localPlayerId = NetworkManagerClient::sInstance->GetPlayerId();
+	const auto& gameObjects = World::sInstance->GetGameObjects();
+	for (const auto& go : gameObjects)
+	{
+		RoboCat* cat = go->GetAsCat();
+		if (cat && cat->GetPlayerId() == localPlayerId)
+		{
+			RenderManager::sInstance->UpdateCamera(cat->GetLocation(), cat->GetSize());
+			break;
+		}
+	}
+
+
 	RenderManager::sInstance->Render();
 
 	NetworkManagerClient::sInstance->SendOutgoingPackets();

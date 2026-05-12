@@ -4,14 +4,37 @@ std::unique_ptr< RenderManager >	RenderManager::sInstance;
 
 RenderManager::RenderManager()
 {
-	view.reset(sf::FloatRect(0, 0, 1280, 720));
-	WindowManager::sInstance->setView(view);
+	//Game view
+	mGameView.reset(sf::FloatRect(0.f, 0.f, 1280.f, 720.f));
+
+	//HUD view
+	mHUDView.reset(sf::FloatRect(0.f, 0.f, 1280.f, 720.f));
+
+	WindowManager::sInstance->setView(mGameView);
 }
 
 
 void RenderManager::StaticInit()
 {
 	sInstance.reset(new RenderManager());
+}
+
+void RenderManager::UpdateCamera(const Vector3& playerPos, float playerSize)
+{
+	//Center camera on the player
+	mGameView.setCenter(playerPos.mX, playerPos.mY);
+
+	//Zoom out as the player grows
+	//At size 1.0  -> viewport is 1280x720  (normal)
+	//At size 3.0  -> viewport is 2560x1440 (2x zoom out)
+	//Clamped so the view never shrinks below the base size
+	float zoomFactor = 1.0f + (playerSize - 1.0f) * 0.5f;
+	if (zoomFactor < 1.0f) zoomFactor = 1.0f;
+	if (zoomFactor > 6.0f) zoomFactor = 6.0f;//cap at 6x zoom out
+
+	mGameView.setSize(1280.f * zoomFactor, 720.f * zoomFactor);
+
+	WindowManager::sInstance->setView(mGameView);
 }
 
 
@@ -63,18 +86,18 @@ void RenderManager::RenderComponents()
 
 void RenderManager::Render()
 {
-	//
-	// Clear the back buffer
-	//
-	WindowManager::sInstance->clear(sf::Color(100, 149, 237, 255));
+	WindowManager::sInstance->clear(sf::Color(50, 168, 82, 255));
 
+	//Draw world objects using the game camera
 	RenderManager::sInstance->RenderComponents();
 
+	//Switch to fixed HUD view so scoreboard text stays on screen
+	WindowManager::sInstance->setView(mHUDView);
 	HUD::sInstance->Render();
 
-	//
-	// Present our back buffer to our front buffer
-	//
+	//Switch back to game view for next frame
+	WindowManager::sInstance->setView(mGameView);
+
 	WindowManager::sInstance->display();
 
 }

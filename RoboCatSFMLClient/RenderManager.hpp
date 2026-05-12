@@ -9,6 +9,7 @@ public:
 
 	void Render();
 	void RenderComponents();
+	void UpdateCamera(const Vector3& playerPos, float playerSize);
 
 	//vert inefficient method of tracking scene graph...
 	void AddComponent(SpriteComponent* inComponent);
@@ -22,7 +23,8 @@ private:
 	//this can't be only place that holds on to component- it has to live inside a GameObject in the world
 	vector< SpriteComponent* >		mComponents;
 
-	sf::View view;
+	sf::View	mGameView;    //follows the player, moves and zooms
+	sf::View	mHUDView;     //fixed to screen, never moves
 
 
 };

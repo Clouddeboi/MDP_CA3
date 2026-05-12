@@ -103,6 +103,7 @@ void RenderManager::RenderComponents()
 	for (SpriteComponent* c : mComponents)
 	{
 		WindowManager::sInstance->draw(c->GetSprite());
+		c->DrawNameLabel();
 	}
 }
 

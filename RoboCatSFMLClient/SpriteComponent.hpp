@@ -14,6 +14,8 @@ public:
 	
 	float GetGameObjectScale() const { return mGameObject ? mGameObject->GetScale() : 0.f; }
 
+	virtual void DrawNameLabel() {}
+
 
 protected:
 

@@ -33,7 +33,6 @@
     <ClInclude Include="SpriteComponent.hpp" />
     <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="WindowManager.hpp" />
-    <ClInclude Include="YarnClient.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
@@ -56,7 +55,6 @@
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="WindowManager.cpp" />
-    <ClCompile Include="YarnClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RoboCatSFML\RoboCatSFML.vcxproj">

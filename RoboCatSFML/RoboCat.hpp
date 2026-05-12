@@ -8,9 +8,8 @@ public:
 		ECRS_Pose = 1 << 0,
 		ECRS_Color = 1 << 1,
 		ECRS_PlayerId = 1 << 2,
-		ECRS_Health = 1 << 3,
 
-		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId | ECRS_Health
+		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId
 	};
 
 
@@ -64,9 +63,6 @@ protected:
 	float				mLastMoveTimestamp;
 
 	float				mThrustDir;
-	int					mHealth;
-
-	bool				mIsShooting;
 };
 
 typedef shared_ptr< RoboCat >	RoboCatPtr;

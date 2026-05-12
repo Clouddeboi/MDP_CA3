@@ -87,9 +87,6 @@
     <ClInclude Include="World.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Yarn.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WeightedTimedMovingAverage.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -171,9 +168,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Yarn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RoboCatPCH.cpp">

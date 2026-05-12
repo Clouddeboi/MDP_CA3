@@ -51,9 +51,6 @@
     <ClInclude Include="WindowManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="YarnClient.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FontManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,9 +96,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WindowManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="YarnClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FontManager.cpp">

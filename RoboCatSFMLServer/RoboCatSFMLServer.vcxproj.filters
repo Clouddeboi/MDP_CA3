@@ -36,9 +36,6 @@
     <ClInclude Include="Server.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="YarnServer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ReplicationManagerTransmissionData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,9 +60,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="YarnServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerMain.cpp">

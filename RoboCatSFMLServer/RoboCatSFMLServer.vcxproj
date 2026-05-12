@@ -165,7 +165,6 @@
     <ClInclude Include="RoboCatServer.hpp" />
     <ClInclude Include="RoboCatServerPCH.hpp" />
     <ClInclude Include="Server.hpp" />
-    <ClInclude Include="YarnServer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClientProxy.cpp" />
@@ -182,7 +181,6 @@
     </ClCompile>
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="ServerMain.cpp" />
-    <ClCompile Include="YarnServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RoboCatSFML\RoboCatSFML.vcxproj">

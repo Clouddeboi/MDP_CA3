@@ -116,22 +116,8 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 		readState |= ECRS_Color;
 	}
 
-	inInputStream.Read(stateBit);
-	if (stateBit)
-	{
-		mHealth = 0;
-		inInputStream.Read(mHealth, 4);
-		readState |= ECRS_Health;
-	}
-
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
-		//did we get health? if so, tell the hud!
-		if ((readState & ECRS_Health) != 0)
-		{
-			HUD::sInstance->SetPlayerHealth(mHealth);
-		}
-
 		DoClientSidePredictionAfterReplicationForLocalCat(readState);
 
 		//if this is a create packet, don't interpolate

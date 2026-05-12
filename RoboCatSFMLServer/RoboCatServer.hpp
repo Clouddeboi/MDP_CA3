@@ -21,13 +21,6 @@ protected:
 
 private:
 
-	void HandleShooting();
-
 	ECatControlType	mCatControlType;
-
-
-	float		mTimeOfNextShot;
-	float		mTimeBetweenShots;
-
 };
 

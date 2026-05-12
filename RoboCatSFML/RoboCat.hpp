@@ -20,6 +20,8 @@ public:
 
 	virtual	RoboCat* GetAsCat() override { return this; }
 
+	virtual bool HandleCollisionWithCat(RoboCat* inCat) override { (void)inCat; return false; }
+
 	virtual void Update() override;
 
 	void ProcessInput(float inDeltaTime, const InputState& inInputState);

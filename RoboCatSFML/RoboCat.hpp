@@ -10,7 +10,7 @@ public:
 		ECRS_PlayerId = 1 << 2,
 		ECRS_Size = 1 << 3,
 
-		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId
+		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId | ECRS_Size
 	};
 
 

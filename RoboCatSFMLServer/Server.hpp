@@ -23,6 +23,7 @@ private:
 	void	RespawnPickupsIfNeeded();
 
 	float	mPickupRespawnTimer;
+	float	mHeartbeatTimer;
 
 };
 

@@ -39,9 +39,11 @@ bool Server::InitNetworkManager()
 
 namespace
 {
-	const int   kMaxPickups = 125;//Total target on the map
-	const int   kPickupsPerSpawn = 5;//How many to spawn each tick
-	const float kPickupRespawnDelay = 1.f;//Check interval in seconds
+	const int   kMaxPickups = 80;
+	const int   kPickupsPerSpawn = 5;
+	const float kPickupRespawnDelay = 1.f;
+
+	const float kHeartbeatInterval = 0.1f;
 
 	void SpawnMice(int inCount)
 	{
@@ -61,9 +63,7 @@ namespace
 		for (const auto& go : World::sInstance->GetGameObjects())
 		{
 			if (go->GetClassId() == 'MOUS')
-			{
 				++count;
-			}
 		}
 		return count;
 	}
@@ -83,6 +83,13 @@ void Server::DoFrame()
 	Engine::DoFrame();
 
 	RespawnPickupsIfNeeded();
+
+	float time = Timing::sInstance.GetFrameStartTime();
+	if (time > mHeartbeatTimer + kHeartbeatInterval)
+	{
+		mHeartbeatTimer = time;
+		NetworkManagerServer::sInstance->UpdateAllClients();
+	}
 
 	NetworkManagerServer::sInstance->SendOutgoingPackets();
 }
@@ -122,8 +129,10 @@ void Server::SpawnCatForPlayer(int inPlayerId)
 
 	//Random spawn anywhere in the world (for now just spawn so we can see them)
 	Vector3 spawnMin(200.f, 200.f, 0.f);
-	Vector3 spawnMax(200.f, 200.f, 0.f);
+	Vector3 spawnMax(4700.f, 4700.f, 0.f);
 	cat->SetLocation(RoboMath::GetRandomVector(spawnMin, spawnMax));
+
+	NetworkManagerServer::sInstance->SetStateDirty(cat->GetNetworkId(), RoboCat::ECRS_AllState);
 }
 
 void Server::HandleLostClient(ClientProxyPtr inClientProxy)

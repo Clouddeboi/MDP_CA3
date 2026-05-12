@@ -9,6 +9,7 @@ public:
 	virtual void			HandleConnectionReset(const SocketAddress& inFromAddress) override;
 
 	void			SendOutgoingPackets();
+	void	UpdateAllClients();
 	void			CheckForDisconnects();
 
 	void			RegisterGameObject(GameObjectPtr inGameObject);
@@ -27,7 +28,7 @@ private:
 	void	ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream);
 
 	void	SendWelcomePacket(ClientProxyPtr inClientProxy);
-	void	UpdateAllClients();
+	//void	UpdateAllClients();
 
 	void	AddWorldStateToPacket(OutputMemoryBitStream& inOutputStream);
 	void	AddScoreBoardStateToPacket(OutputMemoryBitStream& inOutputStream);

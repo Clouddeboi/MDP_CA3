@@ -16,9 +16,9 @@ public:
 		uint32_t		GetPlayerId()	const { return mPlayerId; }
 		const string& GetPlayerName()	const { return mPlayerName; }
 		const string& GetFormattedNameScore()	const { return mFormattedNameScore; }
-		int				GetScore()		const { return mScore; }
+		float			GetSize()		const { return mSize; }
 
-		void			SetScore(int inScore);
+		void			SetSize(float inSize);
 
 		bool			Write(OutputMemoryBitStream& inOutputStream) const;
 		bool			Read(InputMemoryBitStream& inInputStream);
@@ -29,7 +29,7 @@ public:
 		uint32_t		mPlayerId;
 		string			mPlayerName;
 
-		int				mScore;
+		float			mSize;
 
 		string			mFormattedNameScore;
 	};
@@ -37,7 +37,8 @@ public:
 	Entry* GetEntry(uint32_t inPlayerId);
 	bool	RemoveEntry(uint32_t inPlayerId);
 	void	AddEntry(uint32_t inPlayerId, const string& inPlayerName);
-	void	IncScore(uint32_t inPlayerId, int inAmount);
+	//void	IncScore(uint32_t inPlayerId, int inAmount);
+	void	UpdateSize(uint32_t inPlayerId, float inSize);
 
 	bool	Write(OutputMemoryBitStream& inOutputStream) const;
 	bool	Read(InputMemoryBitStream& inInputStream);

@@ -62,6 +62,8 @@ void RoboCatServer::GrowBy(float inAmount)
 	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Size);
 	//Collision radius changed so position may need correcting — mark pose dirty too
 	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Pose);
+
+	ScoreBoardManager::sInstance->UpdateSize(GetPlayerId(), newSize);
 }
 
 void RoboCatServer::CheckForEating()
@@ -118,7 +120,7 @@ void RoboCatServer::CheckForEating()
 		}
 
 		//Award a score point to the eater
-		ScoreBoardManager::sInstance->IncScore(GetPlayerId(), 3);
+		ScoreBoardManager::sInstance->UpdateSize(GetPlayerId(), GetSize());
 
 		break;
 	}

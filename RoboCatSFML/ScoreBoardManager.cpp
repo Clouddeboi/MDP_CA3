@@ -21,19 +21,17 @@ ScoreBoardManager::Entry::Entry(uint32_t inPlayerId, const string& inPlayerName,
 	mPlayerName(inPlayerName),
 	mColor(inColor)
 {
-	SetScore(0);
+	SetSize(1.0f);
 }
 
-void ScoreBoardManager::Entry::SetScore(int32_t inScore)
+void ScoreBoardManager::Entry::SetSize(float inSize)
 {
-	mScore = inScore;
+	mSize = inSize;
 
-	char	buffer[256];
-	snprintf(buffer, 256, "%s %i", mPlayerName.c_str(), mScore);
+	char buffer[256];
+	snprintf(buffer, 256, "%s %.2f m", mPlayerName.c_str(), mSize);
 	mFormattedNameScore = string(buffer);
-
 }
-
 
 ScoreBoardManager::Entry* ScoreBoardManager::GetEntry(uint32_t inPlayerId)
 {
@@ -70,16 +68,14 @@ void ScoreBoardManager::AddEntry(uint32_t inPlayerId, const string& inPlayerName
 	mEntries.emplace_back(inPlayerId, inPlayerName, mDefaultColors[inPlayerId % mDefaultColors.size()]);
 }
 
-void ScoreBoardManager::IncScore(uint32_t inPlayerId, int inAmount)
+void ScoreBoardManager::UpdateSize(uint32_t inPlayerId, float inSize)
 {
 	Entry* entry = GetEntry(inPlayerId);
 	if (entry)
 	{
-		entry->SetScore(entry->GetScore() + inAmount);
+		entry->SetSize(inSize);
 	}
 }
-
-
 
 bool ScoreBoardManager::Write(OutputMemoryBitStream& inOutputStream) const
 {
@@ -120,31 +116,20 @@ bool ScoreBoardManager::Entry::Write(OutputMemoryBitStream& inOutputStream) cons
 	inOutputStream.Write(mColor);
 	inOutputStream.Write(mPlayerId);
 	inOutputStream.Write(mPlayerName);
-	inOutputStream.Write(mScore);
+	inOutputStream.Write(mSize);
 
 	return didSucceed;
 }
 
 bool ScoreBoardManager::Entry::Read(InputMemoryBitStream& inInputStream)
 {
-	bool didSucceed = true;
-
 	inInputStream.Read(mColor);
 	inInputStream.Read(mPlayerId);
-
 	inInputStream.Read(mPlayerName);
 
-	int score;
-	inInputStream.Read(score);
-	if (didSucceed)
-	{
-		SetScore(score);
-	}
+	float size;
+	inInputStream.Read(size);
+	SetSize(size);
 
-
-	return didSucceed;
+	return true;
 }
-
-
-
-

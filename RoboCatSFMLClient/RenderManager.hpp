@@ -19,6 +19,7 @@ public:
 private:
 
 	RenderManager();
+	void RenderBackground();
 
 	//this can't be only place that holds on to component- it has to live inside a GameObject in the world
 	vector< SpriteComponent* >		mComponents;
@@ -26,7 +27,8 @@ private:
 	sf::View	mGameView;    //follows the player, moves and zooms
 	sf::View	mHUDView;     //fixed to screen, never moves
 
-
+	sf::Texture     mBackgroundTexture;
+	sf::Sprite      mBackgroundSprite;
 };
 
 

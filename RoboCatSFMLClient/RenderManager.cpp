@@ -10,6 +10,18 @@ RenderManager::RenderManager()
 	//HUD view
 	mHUDView.reset(sf::FloatRect(0.f, 0.f, 1280.f, 720.f));
 
+	//Load tile texture
+	if (mBackgroundTexture.loadFromFile("../Assets/tiles.png"))
+	{
+		mBackgroundTexture.setRepeated(true);
+
+		//Set texture rect to cover the entire world (5000x5000)
+		//SFML will repeat the tile texture across this rect
+		mBackgroundSprite.setTexture(mBackgroundTexture);
+		mBackgroundSprite.setTextureRect(sf::IntRect(0, 0, 5000, 5000));
+		mBackgroundSprite.setPosition(0.f, 0.f);
+	}
+
 	WindowManager::sInstance->setView(mGameView);
 }
 
@@ -71,6 +83,10 @@ int RenderManager::GetComponentIndex(SpriteComponent* inComponent) const
 	return -1;
 }
 
+void RenderManager::RenderBackground()
+{
+	WindowManager::sInstance->draw(mBackgroundSprite);
+}
 
 //this part that renders the world is really a camera-
 //in a more detailed engine, we'd have a list of cameras, and then render manager would
@@ -86,18 +102,21 @@ void RenderManager::RenderComponents()
 
 void RenderManager::Render()
 {
-	WindowManager::sInstance->clear(sf::Color(50, 168, 82, 255));
+	// Clear with a neutral colour — only visible outside the world boundary
+	WindowManager::sInstance->clear(sf::Color(30, 30, 30, 255));
 
-	//Draw world objects using the game camera
-	RenderManager::sInstance->RenderComponents();
+	//Draw tiled world background
+	RenderBackground();
 
-	//Switch to fixed HUD view so scoreboard text stays on screen
+	//Draw all game objects on top
+	RenderComponents();
+
+	//Switch to fixed HUD view
 	WindowManager::sInstance->setView(mHUDView);
 	HUD::sInstance->Render();
 
-	//Switch back to game view for next frame
+	//Restore game view for next frame
 	WindowManager::sInstance->setView(mGameView);
 
 	WindowManager::sInstance->display();
-
 }

@@ -12,6 +12,7 @@ TextureManager::TextureManager()
 	CacheTexture("PlayerBlob", "../Assets/PlayerBlob.png");
 	CacheTexture("mouse", "../Assets/mouse.png");
 	CacheTexture("yarn", "../Assets/yarn.png");
+	CacheTexture("tiles", "../Assets/tiles.png");
 }
 
 TexturePtr	TextureManager::GetTexture(const string& inTextureName)

@@ -1,23 +1,41 @@
 #include "RoboCatClientPCH.hpp"
 
 PlayerSpriteComponent::PlayerSpriteComponent(GameObject* inGameObject) :
-	SpriteComponent(inGameObject)
+	SpriteComponent(inGameObject),
+	mAnimTime(0.f)
 {}
 
 sf::Sprite& PlayerSpriteComponent::GetSprite()
 {
-	//Update the sprite based on the game object stuff.
+	RoboCat* player = dynamic_cast<RoboCat*>(mGameObject);
+
+	float deltaTime = Timing::sInstance.GetDeltaTime();
+	mAnimTime += deltaTime;
+
+	//Idle pulse = slow gentle breathe
+	//Dashing pulse = faster and slightly stronger
+	float pulseSpeed = player && player->IsDashing() ? 14.f : 3.5f;
+	float pulseAmplitude = player && player->IsDashing() ? 0.06f : 0.03f;
+
+	float pulseMult = 1.0f + pulseAmplitude * std::sin(mAnimTime * pulseSpeed);
+
 	auto pos = mGameObject->GetLocation();
 	auto rot = mGameObject->GetRotation();
-	float scale = mGameObject->GetScale();
+	float base = mGameObject->GetScale();
 
 	m_sprite.setPosition(pos.mX, pos.mY);
 	m_sprite.setRotation(rot);
-	m_sprite.setScale(scale, scale);
+	m_sprite.setScale(base * pulseMult, base * pulseMult);
 
-	RoboCat* player = dynamic_cast<RoboCat*>(mGameObject);
-	Vector3 playerColor = player->GetColor();
-	m_sprite.setColor(sf::Color(playerColor.mX, playerColor.mY, playerColor.mZ, 255));
+	if (player)
+	{
+		Vector3 c = player->GetColor();
+		m_sprite.setColor(sf::Color(
+			static_cast<sf::Uint8>(c.mX),
+			static_cast<sf::Uint8>(c.mY),
+			static_cast<sf::Uint8>(c.mZ),
+			255));
+	}
 
 	return m_sprite;
 }

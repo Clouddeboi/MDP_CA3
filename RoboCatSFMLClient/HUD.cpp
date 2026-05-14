@@ -13,7 +13,8 @@ HUD::HUD() :
 	mRoundTripTimeOrigin(580.f, 10.f, 0.0f),
 	mScoreOffset(0.f, 32.f, 0.0f),
 	mRespawnTimeRemaining(0.f),
-	mRespawnDuration(0.f)
+	mRespawnDuration(0.f),
+	mRoundOverTimeRemaining(0.f)
 {
 }
 
@@ -29,6 +30,15 @@ void HUD::StartRespawnCountdown(float inDuration)
 	mRespawnTimeRemaining = inDuration;
 }
 
+void HUD::StartRoundOverScreen(const string& inWinnerName, float inDuration)
+{
+	mRoundOverWinnerName = inWinnerName;
+	mRoundOverTimeRemaining = inDuration;
+
+	//Suppress the death screen for the duration of the round over overlay
+	mRespawnTimeRemaining = 0.f;
+}
+
 void HUD::Render()
 {
 	if (mRespawnTimeRemaining > 0.f)
@@ -41,9 +51,69 @@ void HUD::Render()
 	//RenderRoundTripTime();
 	RenderScoreBoard();
 
-	if (mRespawnTimeRemaining > 0.f)
-	{
+	if (mRoundOverTimeRemaining > 0.f)
+		RenderRoundOverScreen();
+	else if (mRespawnTimeRemaining > 0.f)
 		RenderDeathScreen();
+}
+
+void HUD::RenderRoundOverScreen()
+{
+	// Dark full-screen overlay
+	sf::RectangleShape overlay;
+	overlay.setSize(sf::Vector2f(1280.f, 720.f));
+	overlay.setPosition(0.f, 0.f);
+	overlay.setFillColor(sf::Color(0, 0, 0, 180));
+	WindowManager::sInstance->draw(overlay);
+
+	sf::Font* font = FontManager::sInstance->GetFont("carlito").get();
+	if (!font) return;
+
+	//Winner title — "(name) Wins!"
+	{
+		sf::Text title;
+		title.setString(mRoundOverWinnerName + " Wins!");
+		title.setFont(*font);
+		title.setCharacterSize(60);
+		title.setFillColor(sf::Color(255, 215, 0, 255));
+		title.setOutlineColor(sf::Color(0, 0, 0, 220));
+		title.setOutlineThickness(3.f);
+		sf::FloatRect b = title.getLocalBounds();
+		title.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
+		title.setPosition(640.f, 280.f);
+		WindowManager::sInstance->draw(title);
+	}
+
+	//Sub-title
+	{
+		sf::Text sub;
+		sub.setString("Starting new round...");
+		sub.setFont(*font);
+		sub.setCharacterSize(32);
+		sub.setFillColor(sf::Color(220, 220, 220, 230));
+		sf::FloatRect b = sub.getLocalBounds();
+		sub.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
+		sub.setPosition(640.f, 360.f);
+		WindowManager::sInstance->draw(sub);
+	}
+
+	//Countdown
+	{
+		int seconds = static_cast<int>(std::ceil(mRoundOverTimeRemaining));
+		char buf[32];
+		snprintf(buf, sizeof(buf), "%d", seconds);
+
+		sf::Text countdown;
+		countdown.setString(buf);
+		countdown.setFont(*font);
+		countdown.setCharacterSize(80);
+		countdown.setFillColor(sf::Color(255, 255, 255, 230));
+		countdown.setOutlineColor(sf::Color(0, 0, 0, 200));
+		countdown.setOutlineThickness(4.f);
+		sf::FloatRect b = countdown.getLocalBounds();
+		countdown.setOrigin(b.left + b.width / 2.f, b.top + b.height / 2.f);
+		countdown.setPosition(640.f, 450.f);
+		WindowManager::sInstance->draw(countdown);
 	}
 }
 

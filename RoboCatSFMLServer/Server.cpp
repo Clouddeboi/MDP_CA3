@@ -1,5 +1,7 @@
 #include "RoboCatServerPCH.hpp"
 
+const float Server::kRoundOverDuration = 5.f;
+
 namespace
 {
 	const float kWorldCX = 2500.f;
@@ -168,6 +170,27 @@ void Server::DoFrame()
 {
 	NetworkManagerServer::sInstance->ProcessIncomingPackets();
 	NetworkManagerServer::sInstance->CheckForDisconnects();
+
+	if (mRoundOver)
+	{
+		mRoundOverTimer -= Timing::sInstance.GetDeltaTime();
+		if (mRoundOverTimer <= 0.f)
+		{
+			mRoundOver = false;
+			ResetRound();
+		}
+
+		//Still send heartbeats so clients stay connected
+		float time = Timing::sInstance.GetFrameStartTime();
+		if (time > mHeartbeatTimer + kHeartbeatInterval)
+		{
+			mHeartbeatTimer = time;
+			NetworkManagerServer::sInstance->UpdateAllClients();
+		}
+		NetworkManagerServer::sInstance->SendOutgoingPackets();
+		return;
+	}
+
 	NetworkManagerServer::sInstance->RespawnCats();
 
 	Engine::DoFrame();
@@ -182,6 +205,58 @@ void Server::DoFrame()
 	}
 
 	NetworkManagerServer::sInstance->SendOutgoingPackets();
+}
+
+void Server::HandleRoundWon(int inWinnerPlayerId)
+{
+	if (mRoundOver) return;
+
+	mRoundOver = true;
+	mRoundOverTimer = kRoundOverDuration;
+
+	//Look up winner name from scoreboard
+	string winnerName = "Unknown";
+	ScoreBoardManager::Entry* entry = ScoreBoardManager::sInstance->GetEntry(inWinnerPlayerId);
+	if (entry) winnerName = entry->GetPlayerName();
+
+	BroadcastRoundOver(winnerName);
+}
+
+void Server::BroadcastRoundOver(const string& inWinnerName)
+{
+	//Build a kRoundOverCC packet containing the winner name and countdown duration
+	OutputMemoryBitStream packet;
+	packet.Write(NetworkManager::kRoundOverCC);
+	packet.Write(inWinnerName);
+	packet.Write(kRoundOverDuration);
+
+	//Send directly to every connected client
+	const auto& clientMap = NetworkManagerServer::sInstance->GetAddressToClientMap();
+	for (const auto& pair : clientMap)
+		NetworkManagerServer::sInstance->SendPacket(packet, pair.first);
+}
+
+void Server::ResetRound()
+{
+	// Reset every living cat to minimum size and respawn at a new clear location
+	const auto& gameObjects = World::sInstance->GetGameObjects();
+	for (int i = 0, c = static_cast<int>(gameObjects.size()); i < c; ++i)
+	{
+		RoboCat* cat = gameObjects[i]->GetAsCat();
+		if (!cat || cat->DoesWantToDie()) continue;
+
+		cat->SetSize(RoboCat::kMinSize);
+		cat->SetVelocity(Vector3::Zero);
+		cat->SetLocation(FindClearSpawnPoint(250.f, 60.f));
+
+		int netId = cat->GetNetworkId();
+		NetworkManagerServer::sInstance->SetStateDirty(netId, RoboCat::ECRS_Size);
+		NetworkManagerServer::sInstance->SetStateDirty(netId, RoboCat::ECRS_Pose);
+
+		//Update scoreboard to reflect reset size
+		if (cat->GetPlayerId() > 0)
+			ScoreBoardManager::sInstance->UpdateSize(cat->GetPlayerId(), RoboCat::kMinSize);
+	}
 }
 
 void Server::RespawnPickupsIfNeeded()

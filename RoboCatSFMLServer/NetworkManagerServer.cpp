@@ -6,6 +6,7 @@ NetworkManagerServer* NetworkManagerServer::sInstance;
 NetworkManagerServer::NetworkManagerServer() :
 	mNewPlayerId(1),
 	mNewNetworkId(1),
+	mTimeOfLastSatePacket(0.f),
 	mTimeBetweenStatePackets(0.033f),
 	mClientDisconnectTimeout(3.f)
 {

@@ -11,6 +11,8 @@ public:
 
 	void StartRespawnCountdown(float inDuration);
 
+	void StartRoundOverScreen(const string& inWinnerName, float inDuration);
+
 private:
 
 	HUD();
@@ -20,6 +22,7 @@ private:
 	void	RenderScoreBoard();
 	void	RenderText(const string& inStr, const Vector3& origin, const Vector3& inColor);
 	void	RenderDeathScreen();
+	void	RenderRoundOverScreen();
 
 	Vector3										mBandwidthOrigin;
 	Vector3										mRoundTripTimeOrigin;
@@ -29,6 +32,9 @@ private:
 
 	float	mRespawnTimeRemaining;
 	float	mRespawnDuration;
+
+	string	mRoundOverWinnerName;
+	float	mRoundOverTimeRemaining;
 };
 
 

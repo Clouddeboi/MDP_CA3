@@ -48,6 +48,8 @@ void NetworkManagerClient::ProcessPacket(InputMemoryBitStream& inInputStream, co
 			HandleStatePacket(inInputStream);
 		}
 		break;
+	case kRoundOverCC:
+		HandleRoundOverPacket(inInputStream);
 	}
 }
 
@@ -235,4 +237,14 @@ void NetworkManagerClient::SendInputPacket()
 
 		SendPacket(inputPacket, mServerAddress);
 	}
+}
+
+void NetworkManagerClient::HandleRoundOverPacket(InputMemoryBitStream& inInputStream)
+{
+	string winnerName;
+	float  duration;
+	inInputStream.Read(winnerName);
+	inInputStream.Read(duration);
+
+	HUD::sInstance->StartRoundOverScreen(winnerName, duration);
 }

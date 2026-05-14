@@ -34,6 +34,8 @@ private:
 	void	HandleGameObjectState(InputMemoryBitStream& inInputStream);
 	void	HandleScoreBoardState(InputMemoryBitStream& inInputStream);
 
+	void	HandleRoundOverPacket(InputMemoryBitStream& inInputStream);
+
 	void	UpdateSendingInputPacket();
 	void	SendInputPacket();
 

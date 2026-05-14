@@ -3,6 +3,9 @@ class NetworkManagerServer : public NetworkManager
 public:
 	static NetworkManagerServer* sInstance;
 
+	typedef unordered_map< int, ClientProxyPtr >          IntToClientMap;
+	typedef unordered_map< SocketAddress, ClientProxyPtr > AddressToClientMap;
+
 	static bool				StaticInit(uint16_t inPort);
 
 	virtual void			ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress) override;
@@ -20,6 +23,7 @@ public:
 	void			RespawnCats();
 
 	ClientProxyPtr	GetClientProxy(int inPlayerId) const;
+	const AddressToClientMap& GetAddressToClientMap() const { return mAddressToClientMap; }
 
 private:
 	NetworkManagerServer();

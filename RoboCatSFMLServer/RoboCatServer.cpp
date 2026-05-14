@@ -4,6 +4,8 @@ namespace
 {
 	//Size drained per second while dashing
 	const float kDashSizeDrainPerSecond = 0.55f;
+
+	const float kWinSize = 2300.f / 60.f;
 }
 
 RoboCatServer::RoboCatServer() :
@@ -81,6 +83,11 @@ void RoboCatServer::GrowBy(float inAmount)
 	NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Pose);
 
 	ScoreBoardManager::sInstance->UpdateSize(GetPlayerId(), newSize);
+
+	if (newSize >= kWinSize)
+	{
+		static_cast<Server*>(Engine::s_instance.get())->HandleRoundWon(GetPlayerId());
+	}
 }
 
 void RoboCatServer::CheckForEating()

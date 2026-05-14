@@ -133,7 +133,7 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 		{
 			if (replicatedSize > mLastKnownSize + 0.01f)
 			{
-				AudioManager::sInstance->PlaySFX("eat");
+				AudioManager::sInstance->PlayEatSFX();
 			}
 		}
 

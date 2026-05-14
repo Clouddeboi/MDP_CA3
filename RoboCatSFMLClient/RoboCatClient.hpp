@@ -20,6 +20,8 @@ private:
 	float				mTimeLocationBecameOutOfSync;
 	float				mTimeVelocityBecameOutOfSync;
 
+	float mLastKnownSize;
+
 	SpriteComponentPtr	mSpriteComponent;
 };
 

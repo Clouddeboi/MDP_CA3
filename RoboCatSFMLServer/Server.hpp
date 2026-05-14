@@ -22,7 +22,7 @@ private:
 	bool	InitNetworkManager();
 	void	SetupWorld();
 	void	RespawnPickupsIfNeeded();
-	void	BroadcastRoundOver(const string& inWinnerName);
+	void	BroadcastRoundOver(const string& inWinnerName, float inRemainingTime);
 	void	ResetRound();
 
 	float	mPickupRespawnTimer;
@@ -30,6 +30,7 @@ private:
 
 	bool	mRoundOver;
 	float	mRoundOverTimer;
+	string	mRoundOverWinnerName;
 	static const float kRoundOverDuration;
 
 };

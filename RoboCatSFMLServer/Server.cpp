@@ -179,22 +179,24 @@ void Server::DoFrame()
 			mRoundOver = false;
 			ResetRound();
 		}
-
-		//Still send heartbeats so clients stay connected
-		float time = Timing::sInstance.GetFrameStartTime();
-		if (time > mHeartbeatTimer + kHeartbeatInterval)
+		else
 		{
-			mHeartbeatTimer = time;
-			NetworkManagerServer::sInstance->UpdateAllClients();
+			//Broadcast remaining time every heartbeat, fixes UDP packet loss
+			//and prevents client timer from getting stuck
+			float time = Timing::sInstance.GetFrameStartTime();
+			if (time > mHeartbeatTimer + kHeartbeatInterval)
+			{
+				mHeartbeatTimer = time;
+				BroadcastRoundOver(mRoundOverWinnerName, mRoundOverTimer);
+				NetworkManagerServer::sInstance->UpdateAllClients();
+			}
+			NetworkManagerServer::sInstance->SendOutgoingPackets();
 		}
-		NetworkManagerServer::sInstance->SendOutgoingPackets();
 		return;
 	}
 
 	NetworkManagerServer::sInstance->RespawnCats();
-
 	Engine::DoFrame();
-
 	RespawnPickupsIfNeeded();
 
 	float time = Timing::sInstance.GetFrameStartTime();
@@ -214,23 +216,20 @@ void Server::HandleRoundWon(int inWinnerPlayerId)
 	mRoundOver = true;
 	mRoundOverTimer = kRoundOverDuration;
 
-	//Look up winner name from scoreboard
-	string winnerName = "Unknown";
+	mRoundOverWinnerName = "Unknown";
 	ScoreBoardManager::Entry* entry = ScoreBoardManager::sInstance->GetEntry(inWinnerPlayerId);
-	if (entry) winnerName = entry->GetPlayerName();
+	if (entry) mRoundOverWinnerName = entry->GetPlayerName();
 
-	BroadcastRoundOver(winnerName);
+	BroadcastRoundOver(mRoundOverWinnerName, mRoundOverTimer);
 }
 
-void Server::BroadcastRoundOver(const string& inWinnerName)
+void Server::BroadcastRoundOver(const string& inWinnerName, float inRemainingTime)
 {
-	//Build a kRoundOverCC packet containing the winner name and countdown duration
 	OutputMemoryBitStream packet;
 	packet.Write(NetworkManager::kRoundOverCC);
 	packet.Write(inWinnerName);
-	packet.Write(kRoundOverDuration);
+	packet.Write(inRemainingTime);
 
-	//Send directly to every connected client
 	const auto& clientMap = NetworkManagerServer::sInstance->GetAddressToClientMap();
 	for (const auto& pair : clientMap)
 		NetworkManagerServer::sInstance->SendPacket(packet, pair.first);

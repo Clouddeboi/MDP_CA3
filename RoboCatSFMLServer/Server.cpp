@@ -1,5 +1,29 @@
 #include "RoboCatServerPCH.hpp"
 
+namespace
+{
+	const float kWorldCX = 2500.f;
+	const float kWorldCY = 2500.f;
+	const float kWorldRadius = 2300.f;
+
+	//Returns a random point guaranteed to be inside the world circle,
+	//padded by inMargin so spawns never appear right on the boundary.
+	Vector3 GetRandomPointInCircle(float inMargin)
+	{
+		float spawnRadius = kWorldRadius - inMargin;
+
+		//Uniform distribution inside a circle via polar coordinates:
+		//sqrt(random) gives a uniform radial distribution (not biased toward centre)
+		float r = spawnRadius * std::sqrt(RoboMath::GetRandomFloat());
+		float angle = RoboMath::GetRandomFloat() * 2.f * RoboMath::PI;
+
+		return Vector3(
+			kWorldCX + r * std::cos(angle),
+			kWorldCY + r * std::sin(angle),
+			0.f);
+	}
+}
+
 bool Server::StaticInit()
 {
 	s_instance.reset(new Server());
@@ -68,13 +92,11 @@ namespace
 
 	void SpawnMice(int inCount)
 	{
-		Vector3 pickupMin(200.f, 200.f, 0.f);
-		Vector3 pickupMax(4800.f, 4800.f, 0.f);
-
 		for (int i = 0; i < inCount; ++i)
 		{
 			GameObjectPtr go = GameObjectRegistry::sInstance->CreateGameObject('MOUS');
-			go->SetLocation(RoboMath::GetRandomVector(pickupMin, pickupMax));
+			//150 unit margin keeps pickups away from the border ring
+			go->SetLocation(GetRandomPointInCircle(150.f));
 		}
 	}
 
@@ -149,9 +171,8 @@ void Server::SpawnCatForPlayer(int inPlayerId)
 	cat->SetSize(1.0f);
 
 	//Random spawn anywhere in the world (for now just spawn so we can see them)
-	Vector3 spawnMin(200.f, 200.f, 0.f);
-	Vector3 spawnMax(4700.f, 4700.f, 0.f);
-	cat->SetLocation(RoboMath::GetRandomVector(spawnMin, spawnMax));
+	//250 unit margin keeps new players away from the border
+	cat->SetLocation(GetRandomPointInCircle(250.f));
 
 	NetworkManagerServer::sInstance->SetStateDirty(cat->GetNetworkId(), RoboCat::ECRS_AllState);
 }

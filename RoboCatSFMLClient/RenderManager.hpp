@@ -32,6 +32,8 @@ private:
 	sf::Texture     mBackgroundTexture;
 	sf::Sprite      mBackgroundSprite;
 
+	sf::CircleShape	mBorderCircle; 
+
 	float	mTargetZoomOffset;
 	float	mCurrentZoomOffset;
 };

@@ -8,6 +8,10 @@ namespace
 
 	// How quickly the camera zoom catches up to the target (higher = snappier)
 	const float kZoomLerpSpeed = 8.0f;
+
+	const float kWorldCX = 2500.f;
+	const float kWorldCY = 2500.f;
+	const float kWorldR = 2300.f;
 }
 
 RenderManager::RenderManager():
@@ -31,6 +35,15 @@ RenderManager::RenderManager():
 		mBackgroundSprite.setTextureRect(sf::IntRect(0, 0, 5000, 5000));
 		mBackgroundSprite.setPosition(0.f, 0.f);
 	}
+
+	mBorderCircle.setRadius(kWorldR);
+	mBorderCircle.setOrigin(kWorldR, kWorldR);
+	mBorderCircle.setPosition(kWorldCX, kWorldCY);
+	mBorderCircle.setFillColor(sf::Color::Transparent);
+	mBorderCircle.setOutlineColor(sf::Color(255, 80, 80, 220));
+	mBorderCircle.setOutlineThickness(18.f);
+	mBorderCircle.setPointCount(128);   // high point count = smooth circle
+
 
 	WindowManager::sInstance->setView(mGameView);
 }
@@ -103,6 +116,8 @@ int RenderManager::GetComponentIndex(SpriteComponent* inComponent) const
 void RenderManager::RenderBackground()
 {
 	WindowManager::sInstance->draw(mBackgroundSprite);
+
+	WindowManager::sInstance->draw(mBorderCircle);
 }
 
 //this part that renders the world is really a camera-

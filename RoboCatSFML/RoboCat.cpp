@@ -3,6 +3,10 @@
 const float WORLD_HEIGHT = 5000.f;
 const float WORLD_WIDTH = 5000.f;
 
+const float WORLD_CENTER_X = 2500.f;
+const float WORLD_CENTER_Y = 2500.f;
+const float WORLD_RADIUS = 2300.f;
+
 RoboCat::RoboCat() :
 	GameObject(),
 	mMaxLinearSpeed(300.f),
@@ -150,39 +154,36 @@ void RoboCat::ProcessCollisions()
 
 void RoboCat::ProcessCollisionsWithScreenWalls()
 {
-	Vector3 location = GetLocation();
-	float x = location.mX;
-	float y = location.mY;
+	float   radius = GetCollisionRadius();
+	Vector3 loc = GetLocation();
 
-	float vx = mVelocity.mX;
-	float vy = mVelocity.mY;
+	//Vector from world centre to player
+	float dx = loc.mX - WORLD_CENTER_X;
+	float dy = loc.mY - WORLD_CENTER_Y;
+	float distFromCentre = std::sqrt(dx * dx + dy * dy);
 
-	float radius = GetCollisionRadius();
+	float allowedDist = WORLD_RADIUS - radius;
 
-	if ((y + radius) >= WORLD_HEIGHT && vy > 0)
+	if (distFromCentre > allowedDist && distFromCentre > 0.f)
 	{
-		mVelocity.mY = 0.f;
-		location.mY = WORLD_HEIGHT - radius;
-		SetLocation(location);
-	}
-	else if (y - radius <= 0 && vy < 0)
-	{
-		mVelocity.mY = 0.f;
-		location.mY = radius;
-		SetLocation(location);
-	}
+		//Normalised direction from centre to player
+		float nx = dx / distFromCentre;
+		float ny = dy / distFromCentre;
 
-	if ((x + radius) >= WORLD_WIDTH && vx > 0)
-	{
-		mVelocity.mX = 0.f;
-		location.mX = WORLD_WIDTH - radius;
-		SetLocation(location);
-	}
-	else if (x - radius <= 0 && vx < 0)
-	{
-		mVelocity.mX = 0.f;
-		location.mX = radius;
-		SetLocation(location);
+		//Push player back inside the circle
+		loc.mX = WORLD_CENTER_X + nx * allowedDist;
+		loc.mY = WORLD_CENTER_Y + ny * allowedDist;
+		SetLocation(loc);
+
+		//Reflect velocity along the inward normal
+		float velDotNormal = mVelocity.mX * nx + mVelocity.mY * ny;
+		if (velDotNormal > 0.f)
+		{
+			mVelocity.mX -= 2.f * velDotNormal * nx;
+			mVelocity.mY -= 2.f * velDotNormal * ny;
+			mVelocity.mX *= mWallRestitution;
+			mVelocity.mY *= mWallRestitution;
+		}
 	}
 }
 

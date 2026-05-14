@@ -11,6 +11,8 @@ public:
 	void RenderComponents();
 	void UpdateCamera(const Vector3& playerPos, float playerSize);
 
+	void AdjustTargetZoom(float inDelta);
+
 	//vert inefficient method of tracking scene graph...
 	void AddComponent(SpriteComponent* inComponent);
 	void RemoveComponent(SpriteComponent* inComponent);
@@ -29,6 +31,9 @@ private:
 
 	sf::Texture     mBackgroundTexture;
 	sf::Sprite      mBackgroundSprite;
+
+	float	mTargetZoomOffset;
+	float	mCurrentZoomOffset;
 };
 
 

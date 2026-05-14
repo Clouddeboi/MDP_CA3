@@ -2,7 +2,17 @@
 
 std::unique_ptr< RenderManager >	RenderManager::sInstance;
 
-RenderManager::RenderManager()
+namespace
+{
+	const float kMaxManualZoom = 4.0f;
+
+	// How quickly the camera zoom catches up to the target (higher = snappier)
+	const float kZoomLerpSpeed = 8.0f;
+}
+
+RenderManager::RenderManager():
+	mTargetZoomOffset(0.f),
+	mCurrentZoomOffset(0.f)
 {
 	//Game view
 	mGameView.reset(sf::FloatRect(0.f, 0.f, 1280.f, 720.f));
@@ -25,6 +35,14 @@ RenderManager::RenderManager()
 	WindowManager::sInstance->setView(mGameView);
 }
 
+void RenderManager::AdjustTargetZoom(float inDelta)
+{
+	mTargetZoomOffset += inDelta;
+
+	//Q can never zoom in past the size-based floor
+	if (mTargetZoomOffset < 0.f)            mTargetZoomOffset = 0.f;
+	if (mTargetZoomOffset > kMaxManualZoom)  mTargetZoomOffset = kMaxManualZoom;
+}
 
 void RenderManager::StaticInit()
 {
@@ -33,22 +51,21 @@ void RenderManager::StaticInit()
 
 void RenderManager::UpdateCamera(const Vector3& playerPos, float playerSize)
 {
-	//Center camera on the player
+	float dt = Timing::sInstance.GetDeltaTime();
+	mCurrentZoomOffset += (mTargetZoomOffset - mCurrentZoomOffset) * kZoomLerpSpeed * dt;
+
 	mGameView.setCenter(playerPos.mX, playerPos.mY);
 
-	//Zoom out as the player grows
-	//At size 1.0  -> viewport is 1280x720  (normal)
-	//At size 3.0  -> viewport is 2560x1440 (2x zoom out)
-	//Clamped so the view never shrinks below the base size
 	float zoomFactor = 1.0f + (playerSize - 1.0f) * 0.5f;
 	if (zoomFactor < 1.0f) zoomFactor = 1.0f;
-	if (zoomFactor > 6.0f) zoomFactor = 6.0f;//cap at 6x zoom out
+	if (zoomFactor > 6.0f) zoomFactor = 6.0f;
 
-	mGameView.setSize(1280.f * zoomFactor, 720.f * zoomFactor);
+	float totalZoom = zoomFactor + mCurrentZoomOffset;
+	if (totalZoom > 6.0f + kMaxManualZoom) totalZoom = 6.0f + kMaxManualZoom;
 
+	mGameView.setSize(1280.f * totalZoom, 720.f * totalZoom);
 	WindowManager::sInstance->setView(mGameView);
 }
-
 
 void RenderManager::AddComponent(SpriteComponent* inComponent)
 {

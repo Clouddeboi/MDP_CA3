@@ -59,6 +59,14 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 	case sf::Keyboard::Space:
 		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsDashing);
 		break;
+	case sf::Keyboard::Q:
+		if (inInputAction == EIA_Pressed)
+			RenderManager::sInstance->AdjustTargetZoom(-0.5f);
+		break;
+	case sf::Keyboard::E:
+		if (inInputAction == EIA_Pressed)
+			RenderManager::sInstance->AdjustTargetZoom(0.5f);
+		break;
 	case sf::Keyboard::Add:
 	case sf::Keyboard::Equal:
 	{

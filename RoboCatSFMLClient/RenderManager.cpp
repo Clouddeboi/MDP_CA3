@@ -42,7 +42,7 @@ RenderManager::RenderManager():
 	mDarknessOverlay.setOrigin(kWorldR, kWorldR);
 	mDarknessOverlay.setPosition(kWorldCX, kWorldCY);
 	mDarknessOverlay.setFillColor(sf::Color::Transparent);
-	mDarknessOverlay.setOutlineColor(sf::Color(0, 0, 0, 255));
+	mDarknessOverlay.setOutlineColor(sf::Color(30, 30, 30, 255));
 	mDarknessOverlay.setOutlineThickness(kDarknessThickness);
 	mDarknessOverlay.setPointCount(128);
 
@@ -50,7 +50,7 @@ RenderManager::RenderManager():
 	mBorderCircle.setOrigin(kWorldR, kWorldR);
 	mBorderCircle.setPosition(kWorldCX, kWorldCY);
 	mBorderCircle.setFillColor(sf::Color::Transparent);
-	mBorderCircle.setOutlineColor(sf::Color(255, 80, 80, 220));
+	mBorderCircle.setOutlineColor(sf::Color(30, 30, 30, 255));
 	mBorderCircle.setOutlineThickness(18.f);
 	mBorderCircle.setPointCount(128);
 

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioManager.hpp" />
     <ClInclude Include="Client.hpp" />
     <ClInclude Include="FontManager.hpp" />
     <ClInclude Include="HUD.hpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="WindowManager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientMain.cpp" />
     <ClCompile Include="FontManager.cpp" />

@@ -2,7 +2,8 @@
 
 RoboCatClient::RoboCatClient() :
 	mTimeLocationBecameOutOfSync(0.f),
-	mTimeVelocityBecameOutOfSync(0.f)
+	mTimeVelocityBecameOutOfSync(0.f),
+	mLastKnownSize(1.0f)
 {
 	mSpriteComponent.reset(new PlayerSpriteComponent(this));
 	mSpriteComponent->SetTexture(TextureManager::sInstance->GetTexture("PlayerBlob"));
@@ -13,6 +14,12 @@ void RoboCatClient::HandleDying()
 	if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
 	{
 		HUD::sInstance->StartRespawnCountdown(3.f);
+
+		//Play death sound when the local player is eaten
+		AudioManager::sInstance->PlaySFX("death");
+
+		//Stop dash sound in case it was playing when we died
+		AudioManager::sInstance->StopDashSound();
 	}
 
 	RoboCat::HandleDying();
@@ -121,6 +128,16 @@ void RoboCatClient::Read(InputMemoryBitStream& inInputStream)
 	{
 		float replicatedSize;
 		inInputStream.Read(replicatedSize);
+
+		if (GetPlayerId() == NetworkManagerClient::sInstance->GetPlayerId())
+		{
+			if (replicatedSize > mLastKnownSize + 0.01f)
+			{
+				AudioManager::sInstance->PlaySFX("eat");
+			}
+		}
+
+		mLastKnownSize = replicatedSize;
 		SetSize(replicatedSize);
 		readState |= ECRS_Size;
 	}

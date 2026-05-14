@@ -10,11 +10,13 @@ bool Client::StaticInit()
 	FontManager::StaticInit();
 	TextureManager::StaticInit();
 	RenderManager::StaticInit();
-	
+	AudioManager::StaticInit();
 
 	HUD::StaticInit();
 
 	s_instance.reset(client);
+
+	AudioManager::sInstance->StartMusic();
 
 	return true;
 }
@@ -53,6 +55,13 @@ void Client::DoFrame()
 		if (cat && cat->GetPlayerId() == localPlayerId)
 		{
 			RenderManager::sInstance->UpdateCamera(cat->GetLocation(), cat->GetSize());
+
+			//Drive dash audio from the local player's current dash state
+			if (cat->IsDashing())
+				AudioManager::sInstance->StartDashSound();
+			else
+				AudioManager::sInstance->StopDashSound();
+
 			break;
 		}
 	}

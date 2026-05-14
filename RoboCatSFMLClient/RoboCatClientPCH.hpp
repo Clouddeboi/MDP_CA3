@@ -9,6 +9,7 @@
 #include "FontManager.hpp"
 #include "RenderManager.hpp"
 #include "WindowManager.hpp"
+#include "AudioManager.hpp"
 
 #include "RoboCatClient.hpp"
 #include "MouseClient.hpp"

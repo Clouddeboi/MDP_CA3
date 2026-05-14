@@ -1,4 +1,3 @@
-#include <iostream>
 #include "RoboCatServerPCH.hpp"
 
 bool Server::StaticInit()
@@ -32,8 +31,30 @@ int Server::Run()
 
 bool Server::InitNetworkManager()
 {
-	string portString = StringUtils::GetCommandLineArg(1);
-	uint16_t port = stoi(portString);
+	string portString;
+
+	//Try to read port from config file first
+	std::ifstream configFile("../Assets/server_config.txt");
+	if (configFile.is_open())
+	{
+		std::getline(configFile, portString);
+
+		//Trim carriage return for Windows line endings
+		if (!portString.empty() && portString.back() == '\r')
+			portString.pop_back();
+	}
+
+	//Fall back to command line arg if file missing or empty
+	if (portString.empty())
+		portString = StringUtils::GetCommandLineArg(1);
+
+	if (portString.empty())
+	{
+		//Last resort default port
+		portString = "50000";
+	}
+
+	uint16_t port = static_cast<uint16_t>(stoi(portString));
 	return NetworkManagerServer::StaticInit(port);
 }
 
@@ -149,7 +170,7 @@ void Server::HandleLostClient(ClientProxyPtr inClientProxy)
 RoboCatPtr Server::GetCatForPlayer(int inPlayerId)
 {
 	const auto& gameObjects = World::sInstance->GetGameObjects();
-	for (int i = 0, c = gameObjects.size(); i < c; ++i)
+	for (int i = 0, c = static_cast<int>(gameObjects.size()); i < c; ++i)
 	{
 		GameObjectPtr go = gameObjects[i];
 		RoboCat* cat = go->GetAsCat();

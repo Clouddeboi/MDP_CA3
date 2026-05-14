@@ -54,14 +54,12 @@ Client::Client()
 	GameObjectRegistry::sInstance->RegisterCreationFunction('RCAT', RoboCatClient::StaticCreate);
 	GameObjectRegistry::sInstance->RegisterCreationFunction('MOUS', MouseClient::StaticCreate);
 
-	string destination = StringUtils::GetCommandLineArg(1);
-	string name = StringUtils::GetCommandLineArg(2);
+	string destination;
+	string name;
+	LoadConnectionConfig(destination, name);
 
 	SocketAddressPtr serverAddress = SocketAddressFactory::CreateIPv4FromString(destination);
-
 	NetworkManagerClient::StaticInit(*serverAddress, name);
-
-	//NetworkManagerClient::sInstance->SetSimulatedLatency(0.0f);
 }
 
 

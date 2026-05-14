@@ -1,3 +1,6 @@
+#include <fstream> 
+#include <iostream>
+
 #include "RoboCatShared.hpp"
 
 #include "ReplicationManagerTransmissionData.hpp"

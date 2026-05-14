@@ -22,7 +22,54 @@ namespace
 			kWorldCY + r * std::sin(angle),
 			0.f);
 	}
+
+	// Returns true if inPosition is clear of all living cats,
+	// given that the spawning player will have inSpawnRadius collision radius.
+	bool IsSpawnPositionClear(const Vector3& inPosition, float inSpawnRadius)
+	{
+		for (const auto& go : World::sInstance->GetGameObjects())
+		{
+			if (go->DoesWantToDie())
+				continue;
+
+			RoboCat* cat = go->GetAsCat();
+			if (!cat)
+				continue;
+
+			Vector3 delta = go->GetLocation() - inPosition;
+			float   distSq = delta.LengthSq2D();
+			float   minSafeDist = inSpawnRadius + cat->GetCollisionRadius();
+
+			// Add a small extra gap so the spawned player is visibly separate
+			const float kSafetyPadding = 60.f;
+			minSafeDist += kSafetyPadding;
+
+			if (distSq < minSafeDist * minSafeDist)
+				return false;
+		}
+		return true;
+	}
+
+	// Tries up to kMaxAttempts random positions and returns the first clear one.
+	// Falls back to the last candidate if no clear position is found
+	// (can happen in very crowded servers).
+	Vector3 FindClearSpawnPoint(float inMargin, float inSpawnRadius)
+	{
+		const int kMaxAttempts = 20;
+		Vector3 candidate;
+
+		for (int i = 0; i < kMaxAttempts; ++i)
+		{
+			candidate = GetRandomPointInCircle(inMargin);
+			if (IsSpawnPositionClear(candidate, inSpawnRadius))
+				return candidate;
+		}
+
+		// No clear spot found — return the last candidate anyway
+		return candidate;
+	}
 }
+
 
 bool Server::StaticInit()
 {
@@ -165,14 +212,20 @@ void Server::HandleNewClient(ClientProxyPtr inClientProxy)
 
 void Server::SpawnCatForPlayer(int inPlayerId)
 {
-	RoboCatPtr cat = std::static_pointer_cast<RoboCat>(GameObjectRegistry::sInstance->CreateGameObject('RCAT'));
+	RoboCatPtr cat = std::static_pointer_cast<RoboCat>(
+		GameObjectRegistry::sInstance->CreateGameObject('RCAT'));
+
 	cat->SetColor(ScoreBoardManager::sInstance->GetEntry(inPlayerId)->GetColor());
 	cat->SetPlayerId(inPlayerId);
 	cat->SetSize(1.0f);
 
-	//Random spawn anywhere in the world (for now just spawn so we can see them)
-	//250 unit margin keeps new players away from the border
-	cat->SetLocation(GetRandomPointInCircle(250.f));
+	//Collision radius at size 1.0 is 60.f
+	const float kSpawnCollisionRadius = 60.f;
+	const float kBorderMargin = 250.f;
+
+	//Find a spawn point that does not overlap any existing living cat
+	Vector3 spawnPos = FindClearSpawnPoint(kBorderMargin, kSpawnCollisionRadius);
+	cat->SetLocation(spawnPos);
 
 	NetworkManagerServer::sInstance->SetStateDirty(cat->GetNetworkId(), RoboCat::ECRS_AllState);
 }

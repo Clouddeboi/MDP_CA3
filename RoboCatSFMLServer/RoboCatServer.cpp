@@ -1,5 +1,11 @@
 #include "RoboCatServerPCH.hpp"
 
+namespace
+{
+	//Size drained per second while dashing
+	const float kDashSizeDrainPerSecond = 0.55f;
+}
+
 RoboCatServer::RoboCatServer() :
 	mCatControlType(ESCT_Human)
 {}
@@ -34,7 +40,18 @@ void RoboCatServer::Update()
 				SimulateMovement(deltaTime);
 
 				//LOG( "Server Move Time: %3.4f deltaTime: %3.4f left rot at %3.4f", unprocessedMove.GetTimestamp(), deltaTime, GetRotation() );
-
+				//Drain size while dashing only if player is above minimum size
+				if (currentState.IsDashing() && GetSize() > RoboCat::kMinSize)
+				{
+					float newSize = GetSize() - kDashSizeDrainPerSecond * deltaTime;
+					if (newSize < RoboCat::kMinSize)
+					{
+						newSize = RoboCat::kMinSize;
+					}
+					SetSize(newSize);
+					NetworkManagerServer::sInstance->SetStateDirty(GetNetworkId(), ECRS_Size);
+					ScoreBoardManager::sInstance->UpdateSize(GetPlayerId(), newSize);
+				}
 			}
 
 			moveList.Clear();

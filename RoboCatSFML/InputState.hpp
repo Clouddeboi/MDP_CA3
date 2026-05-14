@@ -6,11 +6,13 @@ public:
 		mDesiredRightAmount(0),
 		mDesiredLeftAmount(0),
 		mDesiredForwardAmount(0),
-		mDesiredBackAmount(0)
+		mDesiredBackAmount(0),
+		mIsDashing(false)
 	{}
 
 	float GetDesiredHorizontalDelta()	const { return mDesiredRightAmount - mDesiredLeftAmount; }
 	float GetDesiredVerticalDelta()		const { return mDesiredForwardAmount - mDesiredBackAmount; }
+	bool  IsDashing()					const { return mIsDashing; }
 
 	bool Write(OutputMemoryBitStream& inOutputStream) const;
 	bool Read(InputMemoryBitStream& inInputStream);
@@ -20,4 +22,5 @@ private:
 
 	float mDesiredRightAmount, mDesiredLeftAmount;
 	float mDesiredForwardAmount, mDesiredBackAmount;
+	bool  mIsDashing;
 };

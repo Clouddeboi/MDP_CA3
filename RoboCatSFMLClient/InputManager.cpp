@@ -56,6 +56,9 @@ void InputManager::HandleInput(EInputAction inInputAction, int inKeyCode)
 	case sf::Keyboard::S:
 		UpdateDesireFloatFromKey(inInputAction, mCurrentState.mDesiredBackAmount);
 		break;
+	case sf::Keyboard::Space:
+		UpdateDesireVariableFromKey(inInputAction, mCurrentState.mIsDashing);
+		break;
 	case sf::Keyboard::Add:
 	case sf::Keyboard::Equal:
 	{

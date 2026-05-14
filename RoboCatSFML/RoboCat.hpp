@@ -13,6 +13,7 @@ public:
 		ECRS_AllState = ECRS_Pose | ECRS_Color | ECRS_PlayerId | ECRS_Size
 	};
 
+	static constexpr float kMinSize = 1.0f;
 
 	static	GameObject* StaticCreate() { return new RoboCat(); }
 
@@ -39,6 +40,8 @@ public:
 	void	SetSize(float inSize);
 	float	GetSize() const { return mSize; }
 
+	bool	IsDashing() const { return mIsDashing; }
+
 	virtual uint32_t	Write(OutputMemoryBitStream& inOutputStream, uint32_t inDirtyState) const override;
 
 protected:
@@ -62,6 +65,8 @@ private:
 	uint32_t			mPlayerId;
 
 	float		mSize;
+
+	bool		mIsDashing;
 
 protected:
 

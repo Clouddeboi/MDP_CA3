@@ -12,7 +12,8 @@ RoboCat::RoboCat() :
 	mHorizontalDir(0.f),
 	mVerticalDir(0.f),
 	mPlayerId(0),
-	mSize(1.0f)
+	mSize(1.0f),
+	mIsDashing(false)
 {
 	SetCollisionRadius(60.f);
 }
@@ -23,27 +24,37 @@ void RoboCat::ProcessInput(float inDeltaTime, const InputState& inInputState)
 	mHorizontalDir = inInputState.GetDesiredHorizontalDelta();
 	mVerticalDir = inInputState.GetDesiredVerticalDelta();
 
+	mIsDashing = inInputState.IsDashing() && (mSize > kMinSize);
+
 	(void)inDeltaTime;
 }
 
 void RoboCat::AdjustVelocityByInput(float inDeltaTime)
 {
-	//Target velocity from input axes
-	float targetVX = mHorizontalDir * mMaxLinearSpeed;
-	float targetVY = -mVerticalDir * mMaxLinearSpeed;
+	//Dash multiplies top speed, only allowed when above minimum size
+	const float kDashMultiplier = 2.2f;
+	float effectiveSpeed = mMaxLinearSpeed;
+	if (mIsDashing && mSize > kMinSize)
+	{
+		effectiveSpeed *= kDashMultiplier;
+	}
+
+	//Target velocity from input axes, uses effectiveSpeed, not mMaxLinearSpeed
+	float targetVX = mHorizontalDir * effectiveSpeed;
+	float targetVY = -mVerticalDir * effectiveSpeed;
 
 	//Acceleration when input is held, deceleration when released
-	float accel = 1800.f;  //how fast to reach full speed (units/sec^2)
-	float decel = 1200.f;  //how fast to slow down when no input
+	float accel = 1800.f;
+	float decel = 1200.f;
 
 	float lerpX = (targetVX != 0.f) ? accel : decel;
 	float lerpY = (targetVY != 0.f) ? accel : decel;
 
-	//Move current velocity toward target by accel/decel rate this frame
 	float alpha = inDeltaTime;
 
-	mVelocity.mX += (targetVX - mVelocity.mX) * (lerpX * alpha / mMaxLinearSpeed);
-	mVelocity.mY += (targetVY - mVelocity.mY) * (lerpY * alpha / mMaxLinearSpeed);
+	//Normalize lerp against effectiveSpeed so acceleration feel stays consistent
+	mVelocity.mX += (targetVX - mVelocity.mX) * (lerpX * alpha / effectiveSpeed);
+	mVelocity.mY += (targetVY - mVelocity.mY) * (lerpY * alpha / effectiveSpeed);
 }
 
 void RoboCat::SimulateMovement(float inDeltaTime)

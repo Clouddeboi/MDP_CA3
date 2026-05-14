@@ -12,6 +12,8 @@ namespace
 	const float kWorldCX = 2500.f;
 	const float kWorldCY = 2500.f;
 	const float kWorldR = 2300.f;
+
+	const float kDarknessThickness = 1500.f;
 }
 
 RenderManager::RenderManager():
@@ -36,13 +38,21 @@ RenderManager::RenderManager():
 		mBackgroundSprite.setPosition(0.f, 0.f);
 	}
 
+	mDarknessOverlay.setRadius(kWorldR);
+	mDarknessOverlay.setOrigin(kWorldR, kWorldR);
+	mDarknessOverlay.setPosition(kWorldCX, kWorldCY);
+	mDarknessOverlay.setFillColor(sf::Color::Transparent);
+	mDarknessOverlay.setOutlineColor(sf::Color(0, 0, 0, 255));
+	mDarknessOverlay.setOutlineThickness(kDarknessThickness);
+	mDarknessOverlay.setPointCount(128);
+
 	mBorderCircle.setRadius(kWorldR);
 	mBorderCircle.setOrigin(kWorldR, kWorldR);
 	mBorderCircle.setPosition(kWorldCX, kWorldCY);
 	mBorderCircle.setFillColor(sf::Color::Transparent);
 	mBorderCircle.setOutlineColor(sf::Color(255, 80, 80, 220));
 	mBorderCircle.setOutlineThickness(18.f);
-	mBorderCircle.setPointCount(128);   // high point count = smooth circle
+	mBorderCircle.setPointCount(128);
 
 
 	WindowManager::sInstance->setView(mGameView);
@@ -116,6 +126,8 @@ int RenderManager::GetComponentIndex(SpriteComponent* inComponent) const
 void RenderManager::RenderBackground()
 {
 	WindowManager::sInstance->draw(mBackgroundSprite);
+
+	WindowManager::sInstance->draw(mDarknessOverlay);
 
 	WindowManager::sInstance->draw(mBorderCircle);
 }

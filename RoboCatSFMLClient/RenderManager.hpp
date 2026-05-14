@@ -32,6 +32,7 @@ private:
 	sf::Texture     mBackgroundTexture;
 	sf::Sprite      mBackgroundSprite;
 
+	sf::CircleShape	mDarknessOverlay;
 	sf::CircleShape	mBorderCircle; 
 
 	float	mTargetZoomOffset;

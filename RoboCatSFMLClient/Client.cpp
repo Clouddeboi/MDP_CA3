@@ -1,4 +1,32 @@
 #include "RoboCatClientPCH.hpp"
+#include <iostream>
+#include <fstream>
+
+namespace
+{
+	//Reads the config file and fills outDestination and outName
+	//Falls back to command line args if the file is missing or incomplete
+	void LoadConnectionConfig(string& outDestination, string& outName)
+	{
+		std::ifstream configFile("../Assets/config.txt");
+		if (configFile.is_open())
+		{
+			std::getline(configFile, outDestination);
+			std::getline(configFile, outName);
+
+			if (!outDestination.empty() && outDestination.back() == '\r')
+				outDestination.pop_back();
+			if (!outName.empty() && outName.back() == '\r')
+				outName.pop_back();
+		}
+
+		//Fall back to command line args if file was missing or lines were empty
+		if (outDestination.empty())
+			outDestination = StringUtils::GetCommandLineArg(1);
+		if (outName.empty())
+			outName = StringUtils::GetCommandLineArg(2);
+	}
+}
 
 bool Client::StaticInit()
 {

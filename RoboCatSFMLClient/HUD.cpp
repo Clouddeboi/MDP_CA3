@@ -34,13 +34,21 @@ void HUD::StartRoundOverScreen(const string& inWinnerName, float inRemainingTime
 {
 	mRoundOverWinnerName = inWinnerName;
 
+	//Play the win SFX exactly once, only when the screen first activates
+	bool isFirstActivation = (mRoundOverTimeRemaining <= 0.f);
+
 	//Only accept the server's value if it's lower than what we currently have,
 	//or if the screen isn't showing yet, prevents duplicate packets resetting the timer
 	if (mRoundOverTimeRemaining <= 0.f || inRemainingTime < mRoundOverTimeRemaining)
 		mRoundOverTimeRemaining = inRemainingTime;
 
-	//Suppress the death screen for the duration of the round over overlay
-	mRespawnTimeRemaining = 0.f;
+	if (isFirstActivation)
+	{
+		AudioManager::sInstance->PlaySFX("win");
+
+		//Suppress the death screen for the duration of the round-over overlay
+		mRespawnTimeRemaining = 0.f;
+	}
 }
 
 void HUD::Render()

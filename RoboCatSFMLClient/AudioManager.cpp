@@ -19,6 +19,7 @@ AudioManager::AudioManager() :
 	CacheEatSound("../Assets/Audio/eat6.ogg");
 
 	CacheSound("death", "../Assets/Audio/death.ogg");
+	CacheSound("win", "../Assets/Audio/win.ogg");
 
 	//Dash buffer loaded separately so we can loop it on demand
 	mDashBuffer.loadFromFile("../Assets/Audio/dash.ogg");

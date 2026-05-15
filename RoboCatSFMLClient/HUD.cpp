@@ -45,14 +45,22 @@ void HUD::StartRoundOverScreen(const string& inWinnerName, float inRemainingTime
 
 void HUD::Render()
 {
+	//Decrement respawn timer
 	if (mRespawnTimeRemaining > 0.f)
 	{
 		mRespawnTimeRemaining -= Timing::sInstance.GetDeltaTime();
 		if (mRespawnTimeRemaining < 0.f)
 			mRespawnTimeRemaining = 0.f;
 	}
-	//RenderBandWidth();
-	//RenderRoundTripTime();
+
+	//Decrement round-over timer locally every frame
+	if (mRoundOverTimeRemaining > 0.f)
+	{
+		mRoundOverTimeRemaining -= Timing::sInstance.GetDeltaTime();
+		if (mRoundOverTimeRemaining < 0.f)
+			mRoundOverTimeRemaining = 0.f;
+	}
+
 	RenderScoreBoard();
 
 	if (mRoundOverTimeRemaining > 0.f)
